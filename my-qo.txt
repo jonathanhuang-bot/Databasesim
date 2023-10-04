@@ -1,0 +1,19 @@
+Aggregate: I use a hashmap to keep track of my groups. The key in the hashmap has Vec<Field>
+type. The value in my hashmap is a tuple of (Vec<Field>, i32). The i32 in my tuple keeps track of
+the number of tuples for my avg aggop to work. My merge tuple into group checks the hashmap
+to see if the group the tuple belongs to exists. If it does not exist, it creates a new group.
+Otherwise,i will take the previous value in the group and increment it based on the aggop.
+For max and min, I compare the new value with the previous value and see if it satisfies the condition.
+Count increments the previous count by 1. Sum increments the previous sum by the value 
+in the tuple. Avg acts as sum but also keeping track of count in the i32. At the end, avg 
+divides the sum by the count.
+
+Join: In my join, I keep track of the current tuple in the left table. In my next, I have a 
+while loop that iterates through each tuple in the left table. I call on the iterator for
+right child and checks if the join predicate is satisfied. If it is, I merge the left and 
+right tuple together. After looking at each tuple on the right to check one tuple on the left, I rewind
+the iterator for right child and check the next left tuple. Hasheqjoin is similar except I have
+a hashmap in my struct. I create the hashmap in open. I go through each tuple in the left and
+hash it. Then, in next, I see if the right tuple matches the left tuple through the hashmap. 
+
+I spent a week doing this milestone. It took time getting used to working with a library already written.

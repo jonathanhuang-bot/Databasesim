@@ -1,0 +1,20 @@
+In my StorageManager struct, I used two hashmaps, one to map containerID to 
+the heapfile called containers, one to map containerID to the path of the file called names. The hashmap that
+maps containerID to path of the file is used on startup to retrieve HeapFiles
+because heapfiles are not serializable. For insert value, I check the containers hashmap to see 
+if it contains the given containerID, if it does, I look at the corresponding
+heapfile and iterate through the number of pages in that heapfile. I check 
+each page to find the first available page with enough space and insert the 
+value on the page. I write this page back to file and add the heapfile back
+to the hashmap. For delete value, I am given the pageid, slotid, and containerID
+of the value I want to access. I look at the hashmap to find the heapfile to access
+and read the specific page I want. I then delete the value given the slotid.
+For shutdown, I create a file at the storage path which contains the persisted
+metadata. I put the container id and the corresponding filepath in a hashmap
+and serialize it to this file. My new function will check if the storage path 
+directory contains a file. If it does, it will read that file and fill in the 
+hashmaps containers and name.
+
+I spent a little over a week finishing this milestone. I was not ready for so 
+little guidance in suggested steps unlike the page milestone. Deciding where
+to start after finishing heapfile was hard.

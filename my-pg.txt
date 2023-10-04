@@ -1,0 +1,25 @@
+1. Description of solution
+My page struct contains only 1 field which is the array of u8's with length
+PAGE_SIZE. I treat each two bytes as a number. I have a helper function that 
+converts a slice of 2 bytes into a u16. The first 8 bytes of my data are header
+metadata. Bytes 0-1 are page id, 2-3 are lowest empty slot, 4-5 are body offset, 6-7 
+are total slots. I put slot metadata after header metadata. Slot metadata is 6 bytes 
+each. First 2 bytes are slot id, next 2 are slot offset, next 2 are slot size. 
+I have a helper called getfirstfree which will go through all the slot ids in order and
+return the first slotid that has a slotsize of 0 (which indicates that it was deleted).
+I call this helper at the beginning of addvalue in order to know which slot to assign the
+value to. If lowestemptyslot is less than totalslots then I am reusing a slot. If lowest
+emptyslot is equal to totalslots, then I create a new slot. For get_value, I am able to 
+retrieve the value by looking up the slotid and using the corresponding slotoffset and slotsize 
+I have a helper that compacts the data whenever there is free space. I call it after deleting 
+a space so there should only be one gap in the data at the time of the call. The gap is of 
+length slotsize. I move the entire chunk of data that was on the left side of the gap 
+to the right side of the gap (closing the gap). I then go through each slot and look at 
+each slot's slotoffset. If the slotoffset was a number bigger than the slotoffset of the
+slot we deleted, then that means we need to update the slotoffset by subtracting the slotsize 
+of the slot we deleted. Serializing to bytes and deserializing from bytes is easy because 
+the way I implemented my Page, everything is already in bytes. For my PageIntoIter struct,
+I have the fields pos (position) and page. Position basically refers to slotid in my page. 
+My next function calls my get_value function, passing in the pos field of the PageIntoIter 
+struct. After retrieving the value, pos is incremented by 1. If pos equals totalslots, next 
+returns None.
